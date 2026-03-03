@@ -13,16 +13,23 @@ let shared_Library;
 if (platform === 'win32') {
   unicode_type = 'int16_t';
   arch_type = (cpuArchitecture === 'x64' ? 'mingw64' : 'mingw32');
-  shared_Library=path.join(__dirname, "libraries", arch_type, "librdsparser.dll");
-} else if (platform === 'linux') {
-  unicode_type = 'int32_t';
-  arch_type = (cpuArchitecture === 'x64' ? 'x86_64' :
-               (cpuArchitecture === 'ia32' ? 'x86' :
-               (cpuArchitecture === 'arm64' ? 'aarch64' : cpuArchitecture)));
-  shared_Library=path.join(__dirname, "libraries", arch_type, "librdsparser.so");
+  shared_Library = path.join(__dirname, "libraries", arch_type, "librdsparser.dll");
+} else if (platform === 'linux' || platform === 'android') {
+  unicode_type = 'int32_t'; 
+  
+  arch_type = (cpuArchitecture === 'arm64' ? 'aarch64' : 
+               (cpuArchitecture === 'x64' ? 'x86_64' :
+               (cpuArchitecture === 'ia32' ? 'x86' : cpuArchitecture)));
+               
+  shared_Library = path.join(__dirname, "libraries", arch_type, "librdsparser.so");
 } else if (platform === 'darwin') {
   unicode_type = 'int32_t';
-  shared_Library=path.join(__dirname, "libraries", "macos", "librdsparser.dylib");
+  shared_Library = path.join(__dirname, "libraries", "macos", "librdsparser.dylib");
+}
+
+if (!unicode_type) {
+  unicode_type = 'int32_t';
+  shared_Library = path.join(__dirname, "libraries", "aarch64", "librdsparser.so");
 }
 
 const lib = koffi.load(shared_Library);
