@@ -6,6 +6,7 @@ echo -e "#!/bin/sh\nexit 0" > $PREFIX/bin/arecord
 chmod +x $PREFIX/bin/udevadm $PREFIX/bin/arecord
 
 echo "Installing Node.js dependencies..."
+export MAKEFLAGS="-j1"
 npm install --omit=optional
 
 echo "Configuring FFmpeg for Termux..."
