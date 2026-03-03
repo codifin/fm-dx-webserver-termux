@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
+const { SerialPort } = require('serialport')
 const path = require('path');
 const https = require('https');
 
@@ -36,8 +37,12 @@ router.get('/', (req, res) => {
     if (configExists() === false) {
         let serialPorts;
         
-        const deviceList = []; 
-        serialPorts = [];
+        SerialPort.list()
+        .then((deviceList) => {
+            serialPorts = deviceList.map(port => ({
+                path: port.path,
+                friendlyName: port.friendlyName,
+            }));
             
             parseAudioDevice((result) => {
                 res.render('wizard', {
@@ -93,8 +98,12 @@ router.get('/wizard', (req, res) => {
         return;
     }
 
-    const deviceList = []; 
-    serialPorts = [];
+    SerialPort.list()
+    .then((deviceList) => {
+        serialPorts = deviceList.map(port => ({
+            path: port.path,
+            friendlyName: port.friendlyName,
+        }));
         
         parseAudioDevice((result) => {
             res.render('wizard', {
@@ -127,8 +136,12 @@ router.get('/wizard', (req, res) => {
           return;
       }
       
-      const deviceList = []; 
-      serialPorts = [];
+      SerialPort.list()
+      .then((deviceList) => {
+          serialPorts = deviceList.map(port => ({
+              path: port.path,
+              friendlyName: port.friendlyName,
+          }));
           
           parseAudioDevice((result) => {
               const processUptimeInSeconds = Math.floor(process.uptime());

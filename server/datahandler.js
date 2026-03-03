@@ -10,11 +10,14 @@ const { configName, serverConfig, configUpdate, configSave } = require('./server
 let unicode_type;
 let shared_Library;
 
+// Блок определения платформы и типов
 if (platform === 'win32') {
   unicode_type = 'int16_t';
   arch_type = (cpuArchitecture === 'x64' ? 'mingw64' : 'mingw32');
   shared_Library = path.join(__dirname, "libraries", arch_type, "librdsparser.dll");
 } else if (platform === 'linux' || platform === 'android') {
+  // Для Termux/Android используем int32_t (соответствует char32_t/WCHART в Linux) 
+  // или uint16_t в зависимости от компиляции. Для вашего случая пробуем int32_t:
   unicode_type = 'int32_t'; 
   
   arch_type = (cpuArchitecture === 'arm64' ? 'aarch64' : 
@@ -27,6 +30,7 @@ if (platform === 'win32') {
   shared_Library = path.join(__dirname, "libraries", "macos", "librdsparser.dylib");
 }
 
+// Если после всех проверок тип остался неопределенным (специфика Termux)
 if (!unicode_type) {
   unicode_type = 'int32_t';
   shared_Library = path.join(__dirname, "libraries", "aarch64", "librdsparser.so");
@@ -463,6 +467,32 @@ let state = {
   isSerialportRetrying: false,
   lastFrequencyAlive: '87.500'
 };
+
+setInterval(() => {
+  state.lastFrequencyAlive = initialData.freq;
+  const serialportElapsedTime = process.hrtime(serialportUpdateTime)[0];
+  // Activate serialport retry if handleData has not been executed for over 8 seconds
+  if (checkSerialport && (serialportElapsedTime > 8) && !state.isSerialportRetrying && serverConfig.xdrd.wirelessConnection === false) {
+    state.isSerialportAlive = false;
+    state.isSerialportRetrying = true;
+  }
+}, 2000);
+
+// Delay checking Serialport status on startup for 10 seconds
+async function checkSerialPortStatus() {
+    const ServerStartTime = process.hrtime();
+
+    while (!checkSerialport) {
+        const ServerElapsedSeconds = process.hrtime(ServerStartTime)[0];
+
+        if (ServerElapsedSeconds > 10) {
+            checkSerialport = true;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+}
+checkSerialPortStatus();
 
 function showOnlineUsers(currentUsers) {
   dataToSend.users = currentUsers;
