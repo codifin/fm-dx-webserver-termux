@@ -7,6 +7,8 @@ chmod +x $PREFIX/bin/udevadm $PREFIX/bin/arecord
 
 echo "Installing Node.js dependencies..."
 export MAKEFLAGS="-j1"
+export CFLAGS="-I$PREFIX/include"
+export CXXFLAGS="-I$PREFIX/include"
 npm install --omit=optional
 
 echo "Configuring FFmpeg for Termux..."
