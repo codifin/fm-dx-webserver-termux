@@ -49,9 +49,23 @@ function buildCommand(ffmpegPath) {
 
     // Common audio options for FFmpeg
     const baseOptions = {
-        flags: ['-fflags', '+nobuffer+flush_packets', '-flags', 'low_delay', '-rtbufsize', '6192', '-probesize', '32'],
-        codec: ['-acodec', 'pcm_s16le', '-ar', '48000', '-ac', `${audioChannels}`],
-        output: ['-f', 's16le', '-fflags', '+nobuffer+flush_packets', '-packetsize', '384', '-flush_packets', '1', '-bufsize', '960', '-reconnect', '1', '-reconnect_streamed', '1', '-reconnect_delay_max', '10', 'pipe:1']
+    flags: [
+        '-fflags', 'nobuffer', 
+        '-flags', 'low_delay', 
+        '-thread_queue_size', '1024', 
+        '-rtbufsize', '128M',        
+        '-probesize', '32'
+    ],
+    codec: [
+        '-acodec', 'pcm_s16le', 
+        '-ar', '48000', 
+        '-ac', `${audioChannels}`
+    ],
+    output: [
+        '-f', 's16le', 
+        '-packetsize', '1024',       
+        'pipe:1'
+    ]
     };
 
     // Windows
