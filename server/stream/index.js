@@ -3,6 +3,7 @@ const { configName, serverConfig, configUpdate, configSave, configExists } = req
 const { logDebug, logError, logInfo, logWarn, logFfmpeg } = require('../console');
 const checkFFmpeg = require('./checkFFmpeg');
 const audioServer = require('./3las.server');
+const isTermux = process.env.PREFIX && process.env.PREFIX.includes('termux');
 
 const consoleLogTitle = '[Audio Stream]';
 
@@ -25,11 +26,20 @@ function checkAudioUtilities() {
         }
     } else if (process.platform === 'linux') {
         try {
-            execSync('which arecord');
+            if (isTermux) {
+                execSync('which parecord');
+            } else {
+                execSync('which arecord');
+            }
         } catch (error) {
-            logError(`${consoleLogTitle} Error: ALSA ("arecord") not found. Please install ALSA utils.`);
+            if (isTermux) {
+                logError(`${consoleLogTitle} Error: PulseAudio ("parecord") не найден. Выполни: pkg install pulseaudio`);
+            } else {
+                logError(`${consoleLogTitle} Error: ALSA ("arecord") not found. Please install ALSA utils.`);
+            }
             process.exit(1);
         }
+    }
     }
 }
 
@@ -91,13 +101,39 @@ function buildCommand(ffmpegPath) {
             };
         }
     } else {
-        // Linux
-        if (!serverConfig.audio.ffmpeg) {
+        // Linux / Termux
+        if (isTermux) {
+            logInfo(`${consoleLogTitle} Platform: Termux (Android). Используем "pulse" input.`);
+            if (!serverConfig.audio.ffmpeg) {
+                return {
+                    command: `parecord --format=s16le --rate=48000 --channels=${audioChannels} --raw`,
+                    args: [],
+                    arecordArgs: [
+                        '--format=s16le',
+                        '--rate=48000',
+                        '--channels=' + audioChannels,
+                        '--raw'
+                    ],
+                    ffmpegArgs: []
+                };
+            } else {
+                return {
+                    command: ffmpegPath,
+                    args: [
+                        ...baseOptions.flags,
+                        '-f', 'pulse',
+                        '-i', 'default',
+                        ...baseOptions.codec,
+                        ...baseOptions.output
+                    ],
+                    arecordArgs: [],
+                };
+            }
+        } else {
             const prefix = serverConfig.audio.softwareMode ? 'plug' : '';
             const device = `${prefix}${serverConfig.audio.audioDevice}`;
             logInfo(`${consoleLogTitle} Platform: Linux. Using "alsa" input.`);
             return {
-                // command not used if arecordArgs are used
                 command: `while true; do arecord -D "${device}" -f S16_LE -r 48000 -c ${audioChannels} -t raw; done`,
                 args: [],
                 arecordArgs: [
@@ -108,19 +144,6 @@ function buildCommand(ffmpegPath) {
                     '-t', 'raw'
                 ],
                 ffmpegArgs: []
-            };
-        } else {
-            const device = serverConfig.audio.audioDevice;
-            return {
-                command: ffmpegPath,
-                args: [
-                    ...baseOptions.flags,
-                    '-f', 'alsa',
-                    '-i', `${device}`,
-                    ...baseOptions.codec,
-                    ...baseOptions.output
-                ],
-                arecordArgs: [],
             };
         }
     }
@@ -331,26 +354,27 @@ checkFFmpeg().then((ffmpegPath) => {
 
         function startArecord() {
             if (!serverConfig.audio.ffmpeg) {
-                logInfo(`${consoleLogTitle} Запуск захвата звука через Termux API...`);
+                // Spawn the arecord loop
+                logDebug(`${consoleLogTitle} Launching arecord with args: ${commandDef.arecordArgs.join(' ')}`);
 
-                const micProcess = spawn('termux-microphone-record', ['-l', '0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-                currentArecord = micProcess;
+                //const arecord = spawn(commandDef.command, { shell: true, stdio: ['ignore', 'pipe', 'pipe'] });
+                const bin = isTermux ? 'parecord' : 'arecord';
+                const arecord = spawn(bin, commandDef.arecordArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
 
                 audioServer.waitUntilReady.then(() => {
-                    audioServer.Server.StdIn = micProcess.stdout;
+                    audioServer.Server.StdIn = arecord.stdout;
                     audioServer.Server.Run();
-                    connectMessage(`${consoleLogTitle} Звук AUX (Termux) подключен к серверу`);
+                    connectMessage(`${consoleLogTitle} Connected arecord \u2192 FFmpeg \u2192 Server.StdIn${serverConfig.audio.audioBoost && serverConfig.audio.ffmpeg ? ' (audio boost)' : ''}`);
                 });
 
-                micProcess.stderr.on('data', (data) => {
-                    logFfmpeg(`[Termux Mic Error]: ${data}`);
+                arecord.stderr.on('data', (data) => {
+                    logFfmpeg(`[arecord stderr]: ${data}`);
                 });
 
-                micProcess.on('exit', (code) => {
-                    logFfmpeg(`[Mic Process exited] с кодом ${code}`);
+                arecord.on('exit', (code) => {
+                    logFfmpeg(`[arecord exited] with code ${code}`);
                     if (code !== 0) {
-                        logWarn(`${consoleLogTitle} Ошибка микрофона. Перезапуск через 3 сек...`);
-                        setTimeout(startArecord, 3000);
+                        setTimeout(startArecord, 2000);
                     }
                 });
             }
