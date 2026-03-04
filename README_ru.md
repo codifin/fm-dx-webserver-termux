@@ -1,4 +1,4 @@
-# Установка FM-DX Webserver Termux (Android) ([English](https://github.com/fm-dx-webserver-termux/README.MD))
+# Установка FM-DX Webserver Termux (Android) ([English](https://github.com/codifin/fm-dx-webserver-termux/README.MD))
 ### !!!РАБОТАЕТ ТОЛЬКО ПОДКЛЮЧЕНИЕ ЧЕРЕЗ WI-FI ИСПОЛЬЗУЯ XDRD!!!
 
 1. Установите Termux через [Google Play](https://play.google.com/store/apps/details?id=com.termux) или [F-Droid](https://f-droid.org/packages/com.termux/)
