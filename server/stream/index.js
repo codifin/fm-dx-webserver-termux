@@ -331,27 +331,26 @@ checkFFmpeg().then((ffmpegPath) => {
 
         function startArecord() {
             if (!serverConfig.audio.ffmpeg) {
-                // Spawn the arecord loop
-                logDebug(`${consoleLogTitle} Launching arecord with args: ${commandDef.arecordArgs.join(' ')}`);
+                logInfo(`${consoleLogTitle} Запуск захвата звука через Termux API...`);
 
-                //const arecord = spawn(commandDef.command, { shell: true, stdio: ['ignore', 'pipe', 'pipe'] });
-                const arecord = spawn('arecord', commandDef.arecordArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
-                currentArecord = arecord;
+                const micProcess = spawn('termux-microphone-record', ['-l', '0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+                currentArecord = micProcess;
 
                 audioServer.waitUntilReady.then(() => {
-                    audioServer.Server.StdIn = arecord.stdout;
+                    audioServer.Server.StdIn = micProcess.stdout;
                     audioServer.Server.Run();
-                    connectMessage(`${consoleLogTitle} Connected arecord \u2192 FFmpeg \u2192 Server.StdIn${serverConfig.audio.audioBoost && serverConfig.audio.ffmpeg ? ' (audio boost)' : ''}`);
+                    connectMessage(`${consoleLogTitle} Звук AUX (Termux) подключен к серверу`);
                 });
 
-                arecord.stderr.on('data', (data) => {
-                    logFfmpeg(`[arecord stderr]: ${data}`);
+                micProcess.stderr.on('data', (data) => {
+                    logFfmpeg(`[Termux Mic Error]: ${data}`);
                 });
 
-                arecord.on('exit', (code) => {
-                    logFfmpeg(`[arecord exited] with code ${code}`);
+                micProcess.on('exit', (code) => {
+                    logFfmpeg(`[Mic Process exited] с кодом ${code}`);
                     if (code !== 0) {
-                        setTimeout(startArecord, 2000);
+                        logWarn(`${consoleLogTitle} Ошибка микрофона. Перезапуск через 3 сек...`);
+                        setTimeout(startArecord, 3000);
                     }
                 });
             }
