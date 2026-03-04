@@ -22,6 +22,13 @@ function parseAudioDevice(options, callback) {
     const execute = async (fulfill, reject) => {
         try {
             if (platform === 'linux') {
+                const isTermux = process.env.PREFIX && process.env.PREFIX.includes('termux');
+                if (isTermux) {
+                    audioDevices.push({ name: 'default' });
+                    const result = { videoDevices: [], audioDevices };
+                    if (callbackExists) return callback(result);
+                    return fulfill(result);
+                }
                 try {
                     const data = await fs.readFile(filePath, 'utf8');
                     const regex = /\[([^\]]+)\]/g;
