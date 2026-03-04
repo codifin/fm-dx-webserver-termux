@@ -3,30 +3,35 @@
 
 1. Install Termux from [Google Play](https://play.google.com/store/apps/details?id=com.termux) or [F-Droid](https://f-droid.org/packages/com.termux/)
 
-2. Update and install necessary dependencies:
+2. Install Termux:API via [Github](https://github.com/termux/termux-api/releases/download/v0.53.0/termux-api-app_v0.53.0+github.debug.apk) and grant all requested permissions.
+   
+3. Update and install necessary dependencies:
+   
 ```bash
 pkg update && pkg upgrade -y
 ```
 ```bash
-pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make-guile -y
+pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make-guile pulseaudio sox termux-api alsa-utils -y
 ```
 
-3. Clone the repository (or alternatively download it manually):
+4. Clone the repository (or alternatively download it manually):
 
 ```bash
 git clone https://github.com/codifin/fm-dx-webserver-termux/
 cd fm-dx-webserver-termux
-chmod +x setup.sh
+chmod +x setup.sh start.sh
 ```
 
-4. Run the Setup script.
+5. Run the Setup script.
 ```bash
 ./setup.sh
 ```
 
-5. Start the server:
+6. Ensure the receiver is paired with the phone and the connected audio cable is recognized as a microphone.
+   
+7. Start the server:
 ```bash
-node .
+./start.sh
 ```
 Open your web browser and navigate to http:/localhost:8080 to access the web interface.
 
