@@ -27,6 +27,23 @@ node .
 ```
 Open your web browser and navigate to http:/localhost:8080 to access the web interface.
 
+## 🔗 Pairing the Tuner with your Phone
+
+To connect your TEF tuner to the webserver over Wi-Fi, follow these steps:
+
+1.  **Enable Wi-Fi Hotspot**: 
+    Turn on the **Mobile Hotspot** on your Android phone. Ensure you know your Hotspot's SSID (name) and Password.
+
+2.  **Connect the Tuner**:
+    Power on your TEF receiver and connect it to your phone's Hotspot. 
+    * *Tip: Check your phone's "Connected Devices" list to find the Tuner's IP address or check it on TEF's Connectivity setting.*
+
+3.  **Launch & Configure**:
+    Start the server by entering the Tuner's IP. Keep the port as default:
+    * **IP Address**: Enter the IP assigned to the tuner (e.g., `192.168.x.x`).
+    * **Port**: `7373` (Default).
+    * **Password**: Enter your xdrd password.
+
 ## 🐛 Reporting Issues
 
 If you encounter an error, please open an issue and provide the following information:
