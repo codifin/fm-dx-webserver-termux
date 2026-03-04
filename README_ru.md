@@ -1,13 +1,17 @@
-# Установка FM-DX Webserver Termux (Android) ([English](https://github.com/codifin/fm-dx-webserver-termux/README.MD))
+# Установка FM-DX Webserver Termux (Android) ([English](https://github.com/codifin/fm-dx-webserver-termux/blob/main/README.md))
 ### !!!РАБОТАЕТ ТОЛЬКО ПОДКЛЮЧЕНИЕ ЧЕРЕЗ WI-FI ИСПОЛЬЗУЯ XDRD!!!
 
 1. Установите Termux через [Google Play](https://play.google.com/store/apps/details?id=com.termux) или [F-Droid](https://f-droid.org/packages/com.termux/)
 
 2. Обнови и установи необходимые пакеты:
+
 ```bash
 pkg update && pkg upgrade -y
-pkg install nodejs-lts ndk-sysroot clang cmake make binutils python ffmpeg git -y
 ```
+```bash
+pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make -y
+```
+
 3. Склонируйте репозиторий (или скачайте его самостоятельно):
 
 ```bash
