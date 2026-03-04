@@ -8,7 +8,7 @@
 pkg update && pkg upgrade -y
 ```
 ```bash
-pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make -y
+pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make-guile -y
 ```
 
 3. Clone the repository (or alternatively download it manually):
