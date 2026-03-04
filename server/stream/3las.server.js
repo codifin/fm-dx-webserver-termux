@@ -145,7 +145,7 @@ class StreamServer {
             this.FallbackProvider["wav"] = AFallbackProvider.Create(this, "wav");
         }
         this.StdIn = process.stdin;
-        this.SamplesCount = this.SampleRate / 100;
+        this.SamplesCount = this.SampleRate / 50;
         this.Samples = new Int16Array(this.Channels * this.SamplesCount);
         this.SamplesPosition = 0;
     }
