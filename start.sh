@@ -1,6 +1,6 @@
 #!/bin/bash
 
-killall -9 node pulseaudio 2>/dev/null
+killall -9 pulseaudio 2>/dev/null
 rm -rf $TMPDIR/pulse-*
 
 pulseaudio --start --exit-idle-time=-1 2>/dev/null
