@@ -40,7 +40,6 @@ function checkAudioUtilities() {
             process.exit(1);
         }
     }
-    }
 }
 
 function buildCommand(ffmpegPath) {
