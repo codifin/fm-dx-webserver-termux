@@ -5,12 +5,6 @@ echo -e "#!/bin/sh\nexit 0" > $PREFIX/bin/udevadm
 echo -e "#!/bin/sh\nexit 0" > $PREFIX/bin/arecord
 chmod +x $PREFIX/bin/udevadm $PREFIX/bin/arecord
 
-echo "Installing Node.js dependencies..."
-export MAKEFLAGS="-j1"
-export CFLAGS="-I$PREFIX/include"
-export CXXFLAGS="-I$PREFIX/include"
-npm install --build-from-source
-
 echo "Configuring FFmpeg for Termux..."
 mkdir -p node_modules/ffmpeg-static
 echo "module.exports = '$PREFIX/bin/ffmpeg';" > node_modules/ffmpeg-static/index.js
