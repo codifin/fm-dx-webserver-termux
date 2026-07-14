@@ -14,12 +14,13 @@ pkg update && pkg upgrade -y
 pkg install nodejs-lts ndk-sysroot clang cmake binutils python ffmpeg git make-guile pulseaudio sox termux-api alsa-utils -y
 ```
 
-4. Склонируйте репозиторий (или скачайте его самостоятельно):
+4. Склонируйте архив (или скачайте его самостоятельно):
 
 ```bash
-git clone https://github.com/codifin/fm-dx-webserver-termux/
+wget https://github.com/codifin/fm-dx-webserver-termux/releases/download/fm-dx-webserver-termux/fm-dx-webserver-termux.tar.gz
+tar -xzf fm-dx-webserver-termux.tar.gz
 cd fm-dx-webserver-termux
-chmod +x setup.sh
+chmod +x setup.sh start.sh
 ```
 
 5. Запусти скрипт для установки.
