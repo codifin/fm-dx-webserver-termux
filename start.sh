@@ -14,13 +14,23 @@ if [ ! -z "$MISSING_PKGS" ]; then
 fi
 
 echo "[...] Cleaning up previous session"
-pkill -9 node 2>/dev/null
-killall -9 pulseaudio 2>/dev/null
-rm -rf $TMPDIR/pulse-*
 
+pkill node 2>/dev/null
+killall pulseaudio 2>/dev/null
 sleep 1
 
+pkill -9 node 2>/dev/null
+killall -9 pulseaudio 2>/dev/null
+
+rm -rf $TMPDIR/pulse-* 2>/dev/null
+rm -rf ~/.config/pulse 2>/dev/null
+
+sleep 2
+
+echo "[...] Starting Audio Services..."
 pulseaudio --start --exit-idle-time=-1 2>/dev/null
+
+sleep 0.5
 
 pactl unload-module module-sles-source 2>/dev/null
 pactl load-module module-sles-source > /dev/null 2>&1
