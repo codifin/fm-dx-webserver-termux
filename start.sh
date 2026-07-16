@@ -9,27 +9,22 @@ done
 
 echo "[...] Cleaning up previous session"
 
-pids=$(pgrep -f "pulseaudio|node")
-if [ ! -z "$pids" ]; then
-    kill -9 $pids 2>/dev/null
-fi
+pkill node 2>/dev/null
+killall pulseaudio 2>/dev/null
+sleep 1
+
+pkill -9 node 2>/dev/null
+killall -9 pulseaudio 2>/dev/null
 
 rm -rf $TMPDIR/pulse-* 2>/dev/null
 rm -rf ~/.config/pulse 2>/dev/null
-rm -f ~/.config/pulse/* 2>/dev/null
-
-sleep 1
-
-echo "[...] Starting Audio Services..."
-
-pulseaudio --start --exit-idle-time=-1 > /dev/null 2>&1 &
 
 sleep 2
 
-if ! pactl info >/dev/null 2>&1; then
-    pulseaudio -D --exit-idle-time=-1 > /dev/null 2>&1 &
-    sleep 2
-fi
+echo "[...] Starting Audio Services..."
+pulseaudio --start --exit-idle-time=-1 2>/dev/null
+
+sleep 0.5
 
 pactl unload-module module-sles-source 2>/dev/null
 pactl load-module module-sles-source > /dev/null 2>&1
