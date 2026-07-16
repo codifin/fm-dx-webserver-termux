@@ -7,12 +7,6 @@ for pkg in nodejs ffmpeg pulseaudio; do
     fi
 done
 
-if [ ! -z "$MISSING_PKGS" ]; then
-    echo "[!] Error: Missing required system packages:$MISSING_PKGS"
-    echo "Please run: pkg update && pkg install$MISSING_PKGS -y"
-    exit 1
-fi
-
 echo "[...] Cleaning up previous session"
 
 pkill node 2>/dev/null
